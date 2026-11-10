@@ -24,6 +24,7 @@ dialog{background:#101b2a;color:var(--text);border:1px solid #2b4761;border-radi
 <header><div class="brand"><div class="mark">E</div><div><h1>ECL</h1><p>EGGY CHALLENGE LIST</p></div></div><button class="btn" id="submitTop">＋ Submit a challenge</button></header>
 <section class="hero"><div class="eyebrow">BUILT FOR EGGY. SUBMITTED BY YOU.</div><h2>Your next GD challenge<br><span style="color:var(--cyan)">starts here.</span></h2><p>Got a Geometry Dash challenge you want Eggy to play? Send it in. Approved submissions get added to the official ECL.</p></section>
 <section class="stats"><div class="stat"><strong id="total">0</strong><span>Official challenges</span></div><div class="stat"><strong id="completed">0</strong><span>Completed</span></div><div class="stat"><strong id="playing">0</strong><span>In progress</span></div><div class="stat"><strong id="pendingCount">0</strong><span>Pending review</span></div></section>
+<div id="connectionNotice" class="notice">Connecting to ECL database…</div>
 <div class="section-title"><h3>Official challenge list</h3><span class="hint">Approved challenges only</span></div>
 <div class="toolbar"><div class="tabs"><button class="tab active" data-tab="all">All</button><button class="tab" data-tab="Not started">Not started</button><button class="tab" data-tab="In progress">In progress</button><button class="tab" data-tab="Completed">Completed</button></div><span class="hint">Search the ECL</span></div>
 <div class="filters"><input class="field search" id="search" placeholder="Search challenge, creator or level ID…"><select class="field" id="sort" style="max-width:170px"><option value="rank">Rank</option><option value="name">Name A–Z</option><option value="recent">Recently added</option></select></div>
@@ -43,7 +44,13 @@ dialog{background:#101b2a;color:var(--text);border:1px solid #2b4761;border-radi
 <div class="hint">Submissions are reviewed before they appear on the official list.</div></div><div class="modal-actions"><button type="button" class="btn secondary" data-close="submitDialog">Cancel</button><button class="btn" type="submit">Send submission</button></div></form></dialog>
 <dialog id="editDialog"><form id="editForm"><div class="modal-head"><h3>Edit official challenge</h3><button type="button" class="iconbtn" data-close="editDialog">✕</button></div><div class="modal-body">
 <input type="hidden" id="eId"><label>Challenge name<input class="field" id="eName" required></label><label>Creator<input class="field" id="eCreator"></label><label>Level ID<input class="field" id="eLevel"></label><label>Rank<input class="field" id="eRank" type="number" min="1"></label><label>Status<select class="field" id="eStatus"><option>Not started</option><option>In progress</option><option>Completed</option></select></label><label>Notes<input class="field" id="eNotes" maxlength="200"></label></div><div class="modal-actions"><button type="button" class="btn secondary" data-close="editDialog">Cancel</button><button class="btn">Save changes</button></div></form></dialog>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script>
+/* Paste your Supabase Project URL and Publishable key here. Never use a secret/service-role key. */
+const SUPABASE_URL = "https://fpojtrcouvcczqkdkodz.supabase.co";
+const SUPABASE_PUBLISHABLE_KEY = "sb_publishable_iQWp8ZzhzXDX-nUQyNSNpQ_b0r7F5u1";
+const supabaseReady = SUPABASE_URL.startsWith("https://") && SUPABASE_PUBLISHABLE_KEY.startsWith("sb_publishable_");
+const supabaseClient = supabaseReady ? window.supabase.createClient(SUPABASE_URL, SUPABASE_PUBLISHABLE_KEY) : null;
 const CH='ecl_official_v2', SUB='ecl_submissions_v2';
 const starter=[{id:'acu',name:'Acu',creator:'Neigefeu',level:'',rank:'',status:'Completed',notes:'First Extreme Demon completion',created:1},{id:'azurite',name:'Azurite',creator:'Sillow',level:'',rank:'',status:'In progress',notes:'Current best: 93%',created:2},{id:'brutal',name:'BRUTAL',creator:'',level:'',rank:'',status:'In progress',notes:'74–100 ×3 · 55–100',created:3},{id:'bloodbath',name:'Bloodbath',creator:'Riot',level:'',rank:'',status:'Not started',notes:'70–100 practice run',created:4}];
 const load=(k,f)=>{try{const v=localStorage.getItem(k);return v?JSON.parse(v):f}catch{return f}};
@@ -62,10 +69,35 @@ function render(){
 function show(id){$(id).showModal()}
 $('submitTop').onclick=()=>show('submitDialog');
 document.querySelectorAll('[data-close]').forEach(b=>b.onclick=()=>$(b.dataset.close).close());
-$('submitForm').onsubmit=e=>{e.preventDefault();submissions.unshift({id:'sub-'+Date.now(),name:$('sName').value.trim(),creator:$('sCreator').value.trim(),level:$('sLevel').value.trim(),video:$('sVideo').value.trim(),difficulty:$('sDifficulty').value,notes:$('sNotes').value.trim(),review:'Pending',created:Date.now()});e.target.reset();$('submitDialog').close();persist();alert('Submission added to the review queue!')};
-$('submissions').onclick=e=>{let id=e.target.dataset.approve||e.target.dataset.reject;if(!id)return;const x=submissions.find(s=>s.id===id);if(!x)return;if(e.target.dataset.approve){official.push({id:'ecl-'+Date.now(),name:x.name,creator:x.creator,level:x.level,rank:'',status:'Not started',notes:`Suggested: ${x.difficulty}`,created:Date.now()});x.review='Approved'}else{x.review='Rejected'}persist()};
+$('submitForm').onsubmit=async e=>{
+ e.preventDefault();
+ if(!supabaseClient){alert('Add your Supabase Project URL and Publishable key near the top of index.html first.');return;}
+ const payload={challenge_name:$('sName').value.trim(),creator_name:$('sCreator').value.trim(),level_id:$('sLevel').value.trim(),video_url:$('sVideo').value.trim()||null,suggested_difficulty:$('sDifficulty').value,notes:$('sNotes').value.trim()||null};
+ const btn=e.target.querySelector('button[type="submit"]');btn.disabled=true;btn.textContent='Sending…';
+ const {error}=await supabaseClient.from('submissions').insert(payload);
+ btn.disabled=false;btn.textContent='Send submission';
+ if(error){alert('Submission failed: '+error.message);return;}
+ e.target.reset();$('submitDialog').close();alert('Challenge submitted! It will appear on ECL after approval.');
+};
+$('submissions').innerHTML='<div class="empty">Submissions are reviewed privately in the Supabase dashboard.</div>';
 $('rows').onclick=e=>{const id=e.target.dataset.edit,del=e.target.dataset.remove;if(id){const x=official.find(v=>v.id===id);if(!x)return;$('eId').value=x.id;$('eName').value=x.name;$('eCreator').value=x.creator;$('eLevel').value=x.level;$('eRank').value=x.rank;$('eStatus').value=x.status;$('eNotes').value=x.notes;show('editDialog')}if(del&&confirm('Remove this challenge from the official ECL?')){official=official.filter(x=>x.id!==del);persist()}};
 $('editForm').onsubmit=e=>{e.preventDefault();let x=official.find(v=>v.id===$('eId').value);if(x)Object.assign(x,{name:$('eName').value.trim(),creator:$('eCreator').value.trim(),level:$('eLevel').value.trim(),rank:$('eRank').value,status:$('eStatus').value,notes:$('eNotes').value.trim()});$('editDialog').close();persist()};
-document.querySelectorAll('.tab').forEach(b=>b.onclick=()=>{active=b.dataset.tab;document.querySelectorAll('.tab').forEach(t=>t.classList.toggle('active',t===b));render()});
-$('search').oninput=render;$('sort').onchange=render;render();
+async function loadApprovedFromDatabase(){
+ const notice=$('connectionNotice');
+ if(!supabaseClient){notice.textContent='Database not connected yet. Add your Project URL and Publishable key near the top of index.html.';return;}
+ const {data,error}=await supabaseClient.from('submissions').select('id,created_at,challenge_name,creator_name,level_id,suggested_difficulty,notes,status').eq('status','approved');
+ if(error){notice.textContent='Could not load approved challenges: '+error.message;return;}
+ const remote=(data||[]).map(x=>({id:'remote-'+x.id,name:x.challenge_name,creator:x.creator_name,level:x.level_id,rank:'',status:'Not started',notes:[x.suggested_difficulty,x.notes].filter(Boolean).join(' · '),created:new Date(x.created_at||Date.now()).getTime(),remote:true}));
+ official=[...official.filter(x=>!x.remote),...remote];notice.textContent='Connected to ECL. Approved community challenges are shown below.';render();
+}
+document.querySelectorAll('.tab').forEach(b=>b.onclick=()=>{active=b.dataset.tab;async function loadApprovedFromDatabase(){
+ const notice=$('connectionNotice');
+ if(!supabaseClient){notice.textContent='Database not connected yet. Add your Project URL and Publishable key near the top of index.html.';return;}
+ const {data,error}=await supabaseClient.from('submissions').select('id,created_at,challenge_name,creator_name,level_id,suggested_difficulty,notes,status').eq('status','approved');
+ if(error){notice.textContent='Could not load approved challenges: '+error.message;return;}
+ const remote=(data||[]).map(x=>({id:'remote-'+x.id,name:x.challenge_name,creator:x.creator_name,level:x.level_id,rank:'',status:'Not started',notes:[x.suggested_difficulty,x.notes].filter(Boolean).join(' · '),created:new Date(x.created_at||Date.now()).getTime(),remote:true}));
+ official=[...official.filter(x=>!x.remote),...remote];notice.textContent='Connected to ECL. Approved community challenges are shown below.';render();
+}
+document.querySelectorAll('.tab').forEach(t=>t.classList.toggle('active',t===b));render()});
+$('search').oninput=render;$('sort').onchange=render;render();loadApprovedFromDatabase();
 </script></body></html>
