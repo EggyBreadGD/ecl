@@ -1,0 +1,185 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="theme-color" content="#080d16"><title>ECL — Eggy Challenge List</title>
+<style>
+:root{--bg:#080d16;--panel:#101a29;--line:#22354c;--text:#eaf4ff;--muted:#8da4bd;--cyan:#35c8f4;--green:#4dd4a3;--amber:#f4bd58;--red:#f47c82}
+*{box-sizing:border-box}body{margin:0;background:radial-gradient(ellipse at 80% -15%,#12304a 0,transparent 38%),var(--bg);color:var(--text);font:15px/1.5 system-ui,Arial,sans-serif}
+.wrap{max-width:1100px;margin:auto;padding:28px 20px 60px}header{display:flex;justify-content:space-between;align-items:center;gap:15px;padding-bottom:24px;border-bottom:1px solid var(--line)}
+.brand{display:flex;gap:12px;align-items:center}.mark{width:44px;height:44px;border:1px solid #2d91b9;border-radius:12px;display:grid;place-items:center;color:var(--cyan);font-weight:900;font-size:21px;background:#0d2435}
+.brand h1{margin:0;font-size:20px;letter-spacing:.15em}.brand p{margin:0;color:var(--muted);font-size:10px;letter-spacing:.16em}
+.btn{background:linear-gradient(135deg,#167fa9,#2567c8);color:white;border:1px solid #278eb8;border-radius:9px;padding:10px 14px;font-weight:700;cursor:pointer}
+.secondary,.iconbtn{background:#142438;color:#d8eaff;border:1px solid var(--line)}button:disabled{opacity:.5;cursor:not-allowed}
+.hero{padding:36px 0 18px}.eyebrow{color:var(--cyan);font-size:11px;font-weight:800;letter-spacing:.2em}.hero h2{font-size:clamp(32px,5vw,46px);line-height:1.06;margin:10px 0;letter-spacing:-.04em}.hero p,.hint{color:var(--muted)}.hero p{max-width:650px}
+.stats{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin:22px 0 28px}.stat{background:linear-gradient(145deg,#111e2e,#0e1724);border:1px solid var(--line);border-radius:13px;padding:15px}.stat strong{display:block;font-size:25px}.stat span{font-size:10px;color:var(--muted);letter-spacing:.12em;text-transform:uppercase}
+.section-title{display:flex;justify-content:space-between;align-items:center;gap:12px;margin:32px 0 12px}.section-title h3{margin:0;font-size:18px}.toolbar{display:flex;justify-content:space-between;align-items:center;gap:12px;margin-bottom:14px}.tabs{display:flex;gap:4px;background:#0d1724;border:1px solid var(--line);padding:4px;border-radius:10px}.tab{border:0;background:transparent;color:var(--muted);padding:8px 12px;border-radius:7px;cursor:pointer}.tab.active{background:#17344a;color:var(--cyan);font-weight:800}
+.filters{display:flex;gap:9px;margin-bottom:15px}.field{background:#0e1927;border:1px solid var(--line);border-radius:8px;color:var(--text);padding:10px 12px;min-width:0;width:100%}.field:focus{outline:2px solid #2cbce966;border-color:var(--cyan)}.search{flex:1}
+.list{border:1px solid var(--line);border-radius:14px;overflow:hidden;background:#0d1622}.list-head,.item{display:grid;grid-template-columns:60px minmax(170px,1fr) 130px 130px 100px;gap:12px;align-items:center;padding:13px 16px}.list-head{font-size:10px;text-transform:uppercase;letter-spacing:.14em;color:#7892ad;background:#101d2c;border-bottom:1px solid var(--line)}.item{border-bottom:1px solid #1b2a3b;min-height:72px}.item:last-child{border:0}.rank{color:var(--cyan);font-weight:800}.level-name{font-weight:750}.meta{font-size:12px;color:var(--muted);margin-top:2px}.tag{display:inline-flex;border-radius:99px;padding:5px 9px;font-size:11px;font-weight:750;border:1px solid var(--line);width:max-content}.completed{color:var(--green);background:#123329;border-color:#245c4d}.progress{color:var(--cyan);background:#102e40;border-color:#22536b}.considering{color:var(--amber);background:#302817;border-color:#5b4928}.pending{color:var(--amber);background:#302817;border-color:#5b4928}.approved{color:var(--green);background:#123329;border-color:#245c4d}.rejected{color:var(--red);background:#351d25;border-color:#63313d}
+.actions{display:flex;gap:6px;justify-content:flex-end;flex-wrap:wrap}.iconbtn{border-radius:7px;padding:6px 9px;cursor:pointer}.empty{text-align:center;padding:42px;color:var(--muted)}footer{margin-top:24px;color:#667f99;font-size:11px;display:flex;justify-content:space-between;gap:10px}
+dialog{background:#101b2a;color:var(--text);border:1px solid #2b4761;border-radius:15px;width:min(500px,calc(100% - 24px));padding:0;max-height:90vh;overflow:auto}dialog::backdrop{background:#020711bb;backdrop-filter:blur(4px)}.modal-head{padding:17px 20px;border-bottom:1px solid var(--line);display:flex;justify-content:space-between;align-items:center}.modal-head h3{margin:0}.modal-body{padding:18px 20px;display:grid;gap:12px}.modal-body label{font-size:12px;color:var(--muted);display:grid;gap:5px}.modal-actions{padding:0 20px 20px;display:flex;justify-content:flex-end;gap:8px}.hint{font-size:11px}.notice{padding:12px 14px;border:1px solid #24435b;background:#0d2233;border-radius:10px;color:#a9c7df;font-size:12px;margin:14px 0}
+@media(max-width:700px){.wrap{padding:17px 12px 40px}.stats{grid-template-columns:repeat(2,1fr)}.toolbar{align-items:flex-start;flex-direction:column}.list-head{display:none}.item{grid-template-columns:35px 1fr auto;padding:12px 10px;gap:8px}.kind,.rank-col{display:none}.actions{grid-column:2/4;justify-content:flex-start}.filters{flex-wrap:wrap}.search{flex-basis:100%}header{align-items:flex-start;flex-wrap:wrap}}
+</style></head>
+<body><div class="wrap">
+<header><div class="brand"><div class="mark">E</div><div><h1>ECL</h1><p>EGGY CHALLENGE LIST</p></div></div><div style="display:flex;gap:8px;flex-wrap:wrap"><button class="btn secondary" id="accountTop">Log in</button><button class="btn" id="submitTop">＋ Submit a challenge</button></div></header>
+<section class="hero"><div class="eyebrow">BUILT FOR EGGY. SUBMITTED BY YOU.</div><h2>Your next GD challenge<br><span style="color:var(--cyan)">starts here.</span></h2><p>Got a Geometry Dash challenge you want Eggy to play? Send it in. Approved submissions get added to the official ECL.</p></section>
+<section class="stats"><div class="stat"><strong id="total">0</strong><span>Official challenges</span></div><div class="stat"><strong id="completed">0</strong><span>Completed</span></div><div class="stat"><strong id="playing">0</strong><span>In progress</span></div><div class="stat"><strong id="pendingCount">0</strong><span>Pending review</span></div></section>
+<div id="connectionNotice" class="notice">Connecting to ECL database…</div>
+<div class="section-title"><h3>Official challenge list</h3><span class="hint">Approved challenges only</span></div>
+<div class="toolbar"><div class="tabs"><button class="tab active" data-tab="all">All</button><button class="tab" data-tab="Not started">Not started</button><button class="tab" data-tab="In progress">In progress</button><button class="tab" data-tab="Completed">Completed</button></div><span class="hint">Search the ECL</span></div>
+<div class="filters"><input class="field search" id="search" placeholder="Search challenge, creator or level ID…"><select class="field" id="sort" style="max-width:170px"><option value="rank">Rank</option><option value="name">Name A–Z</option><option value="recent">Recently added</option></select></div>
+<div class="list"><div class="list-head"><span>Rank</span><span>Challenge / creator</span><span>Level ID</span><span>Status</span><span style="text-align:right">Actions</span></div><div id="rows"></div></div>
+<div class="notice">Player accounts, public profiles and verified completion submissions require the database upgrade described in the accompanying SQL file. They are not enabled by this HTML-only update.</div>
+<div class="section-title"><h3>Submission review</h3><span class="hint">Your admin queue</span></div>
+<div class="notice">Submissions appear here as pending. Review the level details, then approve them into the official list or reject them.</div>
+<div class="list"><div id="submissions"></div></div>
+<footer><span>EGGY CHALLENGE LIST · ECL</span><span>Community submission prototype · v0.2</span></footer>
+</div>
+<dialog id="authDialog"><form id="authForm"><div class="modal-head"><h3 id="authTitle">Log in to ECL</h3><button type="button" class="iconbtn" data-close="authDialog">✕</button></div><div class="modal-body">
+<label id="usernameWrap" style="display:none">Public username<input class="field" id="authUsername" minlength="3" maxlength="20" pattern="[A-Za-z0-9_]{3,20}" placeholder="3–20 letters, numbers or underscores"></label>
+<label>Email address<input class="field" id="authEmail" type="email" required autocomplete="email" placeholder="you@example.com"></label>
+<label>Password<input class="field" id="authPassword" type="password" required minlength="8" autocomplete="current-password" placeholder="At least 8 characters"></label>
+<div class="hint" id="authHint">Log in to submit challenges and manage your account.</div><div class="hint" id="authError" style="color:var(--red)"></div></div>
+<div class="modal-actions"><button type="button" class="btn secondary" id="authSwitch">Create account</button><button class="btn" id="authSubmit" type="submit">Log in</button></div></form></dialog>
+<dialog id="submitDialog"><form id="submitForm"><div class="modal-head"><h3>Submit a challenge</h3><button type="button" class="iconbtn" data-close="submitDialog">✕</button></div><div class="modal-body">
+<label>Challenge / level name<input class="field" id="sName" required maxlength="80" placeholder="Name of the challenge"></label>
+<label>Creator name<input class="field" id="sCreator" required maxlength="70" placeholder="GD creator"></label>
+<label>Geometry Dash level ID<input class="field" id="sLevel" required maxlength="30" placeholder="e.g. 12345678"></label>
+<label>YouTube video proof (required)<input class="field" id="sVideo" type="url" required placeholder="https://www.youtube.com/watch?v=…"></label>
+<label>Suggested difficulty<select class="field" id="sDifficulty"><option>Unknown</option><option>Easy</option><option>Medium</option><option>Hard</option><option>Very hard</option><option>Extreme</option><option>Challenge-list difficulty</option></select></label>
+<label>Why should Eggy play it?<textarea class="field" id="sNotes" rows="3" maxlength="300" placeholder="Gameplay, gimmicks, best run, etc."></textarea></label>
+<div class="hint">Submissions are reviewed before they appear on the official list.</div></div><div class="modal-actions"><button type="button" class="btn secondary" data-close="submitDialog">Cancel</button><button class="btn" type="submit">Send submission</button></div></form></dialog>
+<dialog id="detailDialog"><div class="modal-head"><h3 id="detailTitle">Challenge details</h3><button type="button" class="iconbtn" data-close="detailDialog">✕</button></div><div class="modal-body" id="detailBody"></div></dialog>
+<dialog id="editDialog"><form id="editForm"><div class="modal-head"><h3>Edit official challenge</h3><button type="button" class="iconbtn" data-close="editDialog">✕</button></div><div class="modal-body">
+<input type="hidden" id="eId"><label>Challenge name<input class="field" id="eName" required></label><label>Creator<input class="field" id="eCreator"></label><label>Level ID<input class="field" id="eLevel"></label><label>Rank<input class="field" id="eRank" type="number" min="1"></label><label>Status<select class="field" id="eStatus"><option>Not started</option><option>In progress</option><option>Completed</option></select></label><label>Notes<input class="field" id="eNotes" maxlength="200"></label></div><div class="modal-actions"><button type="button" class="btn secondary" data-close="editDialog">Cancel</button><button class="btn">Save changes</button></div></form></dialog>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script>
+/* Paste your Supabase Project URL and Publishable key here. Never use a secret/service-role key. */
+const SUPABASE_URL = "https://fpojtrcouvcczqkdkodz.supabase.co";
+const SUPABASE_PUBLISHABLE_KEY = "sb_publishable_iQWp8ZzhzXDX-nUQyNSNpQ_b0r7F5u1";
+// Replace this with your own Supabase Auth user UUID to enable the private admin review counter.
+const ECL_ADMIN_USER_ID = "PASTE_YOUR_USER_UUID_HERE";
+const supabaseReady = SUPABASE_URL.startsWith("https://") && SUPABASE_PUBLISHABLE_KEY.startsWith("sb_publishable_");
+const supabaseClient = supabaseReady ? window.supabase.createClient(SUPABASE_URL, SUPABASE_PUBLISHABLE_KEY) : null;
+let currentSession = null, currentProfile = null, authMode = 'login';
+const CH='ecl_official_v2', SUB='ecl_submissions_v2';
+let official=[], submissions=[], active='all';
+const $=id=>document.getElementById(id), esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+function persist(){localStorage.setItem(CH,JSON.stringify(official));localStorage.setItem(SUB,JSON.stringify(submissions));render()}
+function render(){
+ $('total').textContent=official.length;$('completed').textContent=official.filter(x=>x.status==='Completed').length;$('playing').textContent=official.filter(x=>x.status==='In progress').length;$('pendingCount').textContent=submissions.filter(x=>x.review==='Pending').length;
+ const q=$('search').value.toLowerCase(),sort=$('sort').value;
+ let rows=official.filter(x=>(active==='all'||x.status===active)&&(`${x.name} ${x.creator} ${x.level} ${x.notes}`.toLowerCase().includes(q)));
+ rows.sort((a,b)=>sort==='name'?a.name.localeCompare(b.name):sort==='recent'?(b.created||0)-(a.created||0):((+a.rank||99999)-(+b.rank||99999)));
+ $('rows').innerHTML=rows.length?rows.map(x=>`<div class="item"><div class="rank rank-col">${x.rank?'#'+esc(x.rank):'—'}</div><div><a class="level-name" href="#" data-level="${esc(x.id)}" style="color:var(--text);text-decoration:none">${esc(x.name)}</a><div class="meta">${esc(x.creator||'Creator not added')}${x.notes?' · '+esc(x.notes):''}</div></div><div class="kind meta">${esc(x.level||'—')}</div><div><span class="tag ${x.status==='Completed'?'completed':x.status==='In progress'?'progress':''}">${esc(x.status)}</span></div><div class="actions"><button class="iconbtn" data-edit="${esc(x.id)}">Edit</button><button class="iconbtn" data-remove="${esc(x.id)}">✕</button></div></div>`).join(''):'<div class="empty">No challenges match this view.</div>';
+ const pending=submissions.filter(x=>x.review==='Pending');
+ $('submissions').innerHTML=pending.length?pending.map(x=>`<div class="item" style="grid-template-columns:minmax(170px,1fr) 110px 120px"><div><a class="level-name" href="#" data-level="${esc(x.id)}" style="color:var(--text);text-decoration:none">${esc(x.name)}</a><div class="meta">By ${esc(x.creator)} · ID: ${esc(x.level)} · ${esc(x.difficulty)}${x.notes?' · '+esc(x.notes):''}${x.video?` · <a href="${esc(x.video)}" target="_blank" rel="noopener" style="color:var(--cyan)">Video</a>`:''}</div></div><span class="tag pending">Pending</span><div class="actions"><button class="iconbtn" data-approve="${esc(x.id)}">Approve</button><button class="iconbtn" data-reject="${esc(x.id)}">Reject</button></div></div>`).join(''):'<div class="empty">No pending submissions yet.</div>';
+}
+function show(id){$(id).showModal()}
+
+function setAuthMode(mode){
+  authMode=mode;
+  $('authTitle').textContent=mode==='signup'?'Create your ECL account':'Log in to ECL';
+  $('authSubmit').textContent=mode==='signup'?'Create account':'Log in';
+  $('authSwitch').textContent=mode==='signup'?'Back to log in':'Create account';
+  $('usernameWrap').style.display=mode==='signup'?'grid':'none';
+  $('authUsername').required=mode==='signup';
+  $('authPassword').autocomplete=mode==='signup'?'new-password':'current-password';
+  $('authHint').textContent=mode==='signup'?'Choose a public username. Your email address is never shown on your public profile.':'Log in to submit challenges and manage your account.';
+  $('authError').textContent='';
+}
+async function refreshAccount(){
+  if(!supabaseClient)return;
+  const {data:{session}}=await supabaseClient.auth.getSession();
+  currentSession=session;
+  currentProfile=null;
+  if(session){
+    const {data}=await supabaseClient.from('profiles').select('username').eq('id',session.user.id).maybeSingle();
+    currentProfile=data||null;
+  }
+  $('accountTop').textContent=session?(currentProfile?.username||'My account')+' · Log out':'Log in';
+}
+$('accountTop').onclick=async()=>{
+  if(currentSession){
+    const {error}=await supabaseClient.auth.signOut();
+    if(error)alert('Could not log out: '+error.message);
+    else {currentSession=null;currentProfile=null;await refreshAccount();}
+  } else {setAuthMode('login');show('authDialog');}
+};
+$('authSwitch').onclick=()=>setAuthMode(authMode==='login'?'signup':'login');
+$('authForm').onsubmit=async e=>{
+  e.preventDefault();
+  if(!supabaseClient){$('authError').textContent='Supabase is not configured.';return;}
+  const email=$('authEmail').value.trim(),password=$('authPassword').value;
+  const btn=$('authSubmit');btn.disabled=true;
+  try{
+    if(authMode==='signup'){
+      const username=$('authUsername').value.trim().toLowerCase();
+      if(!/^[a-z0-9_]{3,20}$/.test(username)){throw new Error('Username must be 3–20 characters using letters, numbers or underscores.');}
+      const {data,error}=await supabaseClient.auth.signUp({email,password,options:{data:{username}}});
+      if(error)throw error;
+      if(data.session){currentSession=data.session;await refreshAccount();$('authDialog').close();alert('Account created! You are logged in.');}
+      else{$('authError').style.color='var(--green)';$('authError').textContent='Account created. Check your email for a confirmation link, then log in.';}
+    }else{
+      const {data,error}=await supabaseClient.auth.signInWithPassword({email,password});
+      if(error)throw error;
+      currentSession=data.session;await refreshAccount();$('authDialog').close();alert('Logged in successfully.');
+    }
+  }catch(err){$('authError').style.color='var(--red)';$('authError').textContent=err.message||'Authentication failed.';}
+  finally{btn.disabled=false;}
+};
+if(supabaseClient){
+  supabaseClient.auth.onAuthStateChange(()=>{setTimeout(async()=>{await refreshAccount();await loadPendingReviewFromDatabase();},0);});
+  refreshAccount().then(loadPendingReviewFromDatabase);
+}
+
+$('submitTop').onclick=()=>{if(!currentSession){setAuthMode('login');show('authDialog');alert('Log in or create an account before submitting a challenge.');return;}show('submitDialog');};
+document.querySelectorAll('[data-close]').forEach(b=>b.onclick=()=>$(b.dataset.close).close());
+$('submitForm').onsubmit=async e=>{
+ e.preventDefault();
+ if(!supabaseClient){alert('Supabase is not configured.');return;} if(!currentSession){alert('Please log in first.');return;}
+ const video=$('sVideo').value.trim();
+  if(!/^https?:\/\/(www\.)?(youtube\.com\/watch\?v=|youtu\.be\/|youtube\.com\/shorts\/)/i.test(video)){alert('Please enter a valid YouTube video link.');return;}
+  const payload={challenge_name:$('sName').value.trim(),creator_name:$('sCreator').value.trim(),level_id:$('sLevel').value.trim(),video_url:video,suggested_difficulty:$('sDifficulty').value,notes:$('sNotes').value.trim()||null,user_id:currentSession.user.id,status:'pending'};
+ const btn=e.target.querySelector('button[type="submit"]');btn.disabled=true;btn.textContent='Sending…';
+ const {error}=await supabaseClient.from('submissions').insert(payload);
+ btn.disabled=false;btn.textContent='Send submission';
+ if(error){alert('Submission failed: '+error.message);return;}
+ e.target.reset();$('submitDialog').close();await loadPendingReviewFromDatabase();alert('Challenge submitted! It will appear on ECL after approval.');
+};
+$('submissions').innerHTML='<div class="empty">Review submissions in Supabase → Table Editor → submissions. Change status to approved or rejected.</div>';
+$('rows').onclick=e=>{const level=e.target.closest('[data-level]');if(level){e.preventDefault();const x=official.find(v=>String(v.id)===level.dataset.level);if(x){$('detailTitle').textContent=x.name;$('detailBody').innerHTML='<div><b>Creator:</b> '+esc(x.creator)+'</div><div><b>Level ID:</b> '+esc(x.level)+'</div><div><b>Difficulty:</b> '+esc(x.difficulty||'Unknown')+'</div>'+(x.video?'<p><a target="_blank" rel="noopener" href="'+esc(x.video)+'" style="color:var(--cyan)">Watch proof video</a></p>':'<p>No video URL stored for this submission.</p>');show('detailDialog')}return;}const id=e.target.dataset.edit,del=e.target.dataset.remove;if(id){const x=official.find(v=>v.id===id);if(!x)return;$('eId').value=x.id;$('eName').value=x.name;$('eCreator').value=x.creator;$('eLevel').value=x.level;$('eRank').value=x.rank;$('eStatus').value=x.status;$('eNotes').value=x.notes;show('editDialog')}if(del&&confirm('Remove this challenge from the official ECL?')){official=official.filter(x=>x.id!==del);persist()}};
+$('editForm').onsubmit=e=>{e.preventDefault();let x=official.find(v=>v.id===$('eId').value);if(x)Object.assign(x,{name:$('eName').value.trim(),creator:$('eCreator').value.trim(),level:$('eLevel').value.trim(),rank:$('eRank').value,status:$('eStatus').value,notes:$('eNotes').value.trim()});$('editDialog').close();persist()};
+async function loadPendingReviewFromDatabase(){
+  const count=$('pendingCount');
+  if(!supabaseClient || !currentSession || ECL_ADMIN_USER_ID==='PASTE_YOUR_USER_UUID_HERE' || currentSession.user.id!==ECL_ADMIN_USER_ID){
+    submissions=[];render();return;
+  }
+  const {data,error}=await supabaseClient.from('submissions')
+    .select('id,created_at,challenge_name,creator_name,level_id,video_url,suggested_difficulty,notes,status')
+    .eq('status','pending');
+  if(error){
+    count.title='Could not load pending submissions: '+error.message;
+    console.error('ECL pending review load failed:',error.message);
+    return;
+  }
+  submissions=(data||[]).map(x=>({
+    id:x.id,name:x.challenge_name,creator:x.creator_name,level:x.level_id,
+    video:x.video_url,difficulty:x.suggested_difficulty,notes:x.notes||'',
+    review:'Pending',created:x.created_at?new Date(x.created_at).getTime():0
+  }));
+  count.title='Pending submissions waiting for review';
+  render();
+}
+
+async function loadApprovedFromDatabase(){
+ const notice=$('connectionNotice');
+ if(!supabaseClient){notice.textContent='Database not connected yet. Add your Project URL and Publishable key near the top of index.html.';return;}
+ const {data,error}=await supabaseClient.from('submissions').select('id,created_at,challenge_name,creator_name,level_id,video_url,suggested_difficulty,notes,status').eq('status','approved');
+ if(error){notice.textContent='Could not load approved challenges: '+error.message;return;}
+ const remote=(data||[]).map(x=>({id:'remote-'+x.id,name:x.challenge_name,creator:x.creator_name,level:x.level_id,rank:'',status:'Not started',difficulty:x.suggested_difficulty,video:x.video_url,notes:x.notes||'',created:new Date(x.created_at||Date.now()).getTime(),remote:true}));
+ official=remote;notice.textContent='Connected to ECL. Showing approved community challenges only.';render();
+}
+document.querySelectorAll('.tab').forEach(b=>b.onclick=()=>{active=b.dataset.tab;document.querySelectorAll('.tab').forEach(t=>t.classList.toggle('active',t===b));render()});
+$('search').oninput=render;$('sort').onchange=render;render();loadApprovedFromDatabase();loadPendingReviewFromDatabase();
+</script></body></html>
